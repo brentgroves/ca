@@ -27,3 +27,16 @@ zlint	ERROR	Subscriber certificates must contain at least one policy identifier 
 zlint	WARNING	Subscriber certificates authorityInformationAccess extension should contain the HTTP URL of the issuing CA’s certificate
 zlint	NOTICE	Check if certificate has enough embedded SCTs to meet Apple CT Policy
 zlint	NOTICE	Subscriber Certificate: commonName is deprecated.
+
+# linter errors left
+START HERE
+cablint	ERROR	BR certificates must include an HTTP URL of the OCSP responder
+cablint	INFO	Name has deprecated attribute emailAddress
+cablint	INFO	TLS Server certificate identified
+x509lint	ERROR	No OCSP over HTTP
+x509lint	INFO	Checking as leaf certificate
+x509lint	INFO	Subject has a deprecated CommonName
+x509lint	INFO	Unknown validation policy
+zlint	ERROR	Subscriber Certificate: authorityInformationAccess MUST contain the HTTP URL of the Issuing CA's OSCP responder.
+zlint	NOTICE	Check if certificate has enough embedded SCTs to meet Apple CT Policy
+zlint	NOTICE	Subscriber Certificate: commonName is deprecated.

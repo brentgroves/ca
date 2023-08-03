@@ -94,7 +94,7 @@ bash
 openssl req -passin file:/home/brent/src/ca/mypass.enc \
         -config ~/src/ca/openssl_intermediate.cnf \
         -key ~/src/ca/intermediateCA/private/moto.busche-cnc.com.san.key.pem \
-        -new -sha256 -out ~/src/ca/intermediateCA/csr/m2oto.busche-cnc.com.san.csr.pem
+        -new -sha256 -out ~/src/ca/intermediateCA/csr/moto2.busche-cnc.com.san.csr.pem
 
 openssl req -new -subj "/C=GB/CN=foo" \
              -addext "subjectAltName = DNS:foo.co.uk" \
@@ -103,7 +103,6 @@ openssl req -new -subj "/C=GB/CN=foo" \
 
 ## note set common name equal to a name in alt_names
 [alt_names]
-IP.1 = 10.1.1.83
 DNS.1 = moto.busche-cnc.com
 
 # Openssl sign CSR with Subject Alternative Name
@@ -113,7 +112,7 @@ The server certificate will be valid of 365 days and with sha256 algorithm
 Since our CA key is encrypted with passphrase, I have used -passin to provide the passphrase, If I do not use this argument then the command will prompt for input passphrase.
 In this command using openssl x509 we create SAN certificate server.cert.pem
 bash
-openssl x509 -req -in /home/brent/src/ca/intermediateCA/csr/moto.busche-cnc.com.san.csr.pem -passin file:/home/brent/src/ca/mypass.enc -CA /home/brent/src/ca/intermediateCA/certs/ca-chain.cert.pem -CAkey /home/brent/src/ca/intermediateCA/private/intermediate.key.pem -out /home/brent/src/ca/intermediateCA/certs/moto.busche-cnc.com.san.cert.pem -CAcreateserial -days 365 -sha256 -extfile /home/brent/src/ca/server_cert_ext.cnf
+openssl x509 -req -in /home/brent/src/ca/intermediateCA/csr/moto2.busche-cnc.com.san.csr.pem -passin file:/home/brent/src/ca/mypass.enc -CA /home/brent/src/ca/intermediateCA/certs/ca-chain.cert.pem -CAkey /home/brent/src/ca/intermediateCA/private/intermediate.key.pem -out /home/brent/src/ca/intermediateCA/certs/moto2.busche-cnc.com.san.cert.pem -CAcreateserial -days 365 -sha256 -extfile /home/brent/src/ca/server_cert_ext.cnf
 
 Signature ok
 subject=C = US, ST = Indiana, L = Albion, O = Mobex Global, OU = Information Systems, CN = moto.busche-cnc.com, emailAddress = bgroves@mobexglobal.com
