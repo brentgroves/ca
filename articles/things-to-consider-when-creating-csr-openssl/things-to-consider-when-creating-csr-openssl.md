@@ -51,9 +51,9 @@ organizationalUnitName  = optional
 commonName              = supplied
 emailAddress            = optional
 
-# Next let us try to generate CSR using this custom configuration file:
 ## gen another private key with the mypass.enc file from generate-self-signed-certificate-openssl
 openssl genrsa -des3 -passout file:mypass.enc -out server.key
+# Next let us try to generate CSR using this custom configuration file:
 openssl req -new -key server.key -out server.csr -config custom_openssl.cnf
 
 This would mean that both RootCA and server/client certificate must have same countryName, stateOrProvinceName and organizationName or else the signing will fail.
@@ -62,6 +62,13 @@ This would mean that both RootCA and server/client certificate must have same co
 
 Let me generate my RootCA certificate:
 
+Let me generate my RootCA certificate:
+
+bash
+
+[root@controller certs]# openssl genrsa -out ca.key 4096
+
+[root@controller certs]# openssl req -new -x509 -days 365 -key ca.key -out cacert.pem
 
 
 

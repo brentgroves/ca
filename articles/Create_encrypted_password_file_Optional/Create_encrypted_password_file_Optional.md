@@ -1,3 +1,14 @@
+https://superuser.com/questions/1254036/what-does-openssl-rsa-passin-passxxx-without-other-important-commands-do
+openssl genrsa -des3 -passout pass:123 -out server.key 2048
+# remove password
+openssl rsa -passin pass:123 -in server.key -out server.key
+# usage 1
+openssl genrsa -des3 -passout pass:123 -out server.key 2048
+openssl rsa -passin pass:123 -noout -text -in server.key
+# usage 2
+openssl genrsa -des3 -passout file:/home/brent/src/ca/mypass.enc -out server3.key 2048
+openssl rsa -passin file:/home/brent/src/ca/mypass.enc -noout -text -in server3.key
+
 https://www.golinuxcloud.com/generate-self-signed-certificate-openssl/#Create_encrypted_password_file_Optional
 I have created a plain text file "mypass" with my "secret" passphrase
 echo secret > mypass
