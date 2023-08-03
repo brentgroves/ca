@@ -89,7 +89,12 @@ Use below command to create Root Certificate Authority Certificate cacert.pem. I
 
 bash
 
-openssl req -passin file:/home/brent/src/ca/mypass.enc -config ~/src/ca/openssl_root.cnf -key ~/src/ca/rootCA/private/ca.key.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out ~/src/ca/rootCA/certs/ca.cert.pem -subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/OU=Information Systems/CN=Root CA"
+openssl req -passin file:/home/brent/src/ca/mypass.enc \
+-config ~/src/ca/openssl_root.cnf \
+-key ~/src/ca/rootCA/private/ca.key.pem \
+-new -x509 -days 7300 -sha256 -extensions v3_ca \
+-out ~/src/ca/rootCA/certs/ca.cert.pem \
+-subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/CN=Root CA"
 
 The CA certificate can be world readable so that it can be used to sign the cert by anyone.
 
@@ -111,6 +116,13 @@ the Subject, which refers to the certificate itself
 The Issuer and Subject are identical as the certificate is self-signed.
 The output also shows the X509v3 extensions. We applied the v3_ca extension, so the options from [ v3_ca ] should be reflected in the output.
 
+# chrome linter
+https://crt.sh/lintcert
+cablint	NOTICE	CA certificates without Digital Signature do not allow direct signing of OCSP responses
+cablint	INFO	CA certificate identified
+x509lint	INFO	Checking as root CA certificate
+zlint	NOTICE	Root and Subordinate CA Certificates that wish to use their private key for signing OCSP responses will not be able to without their digital signature set
+
 # Step 4: Generate the intermediate CA key pair and certificate
 Create an RSA key pair for the intermediate CA without a password and secure the file by removing permissions to groups and others:
 
@@ -125,12 +137,23 @@ openssl rsa -passin file:/home/brent/src/ca/mypass.enc -noout -text -in ~/src/ca
 If you are not familiar with the content to be provided with CSR then you should read Things to consider when creating CSR with OpenSSL
 
 bash
-openssl req -passin file:/home/brent/src/ca/mypass.enc -config ~/src/ca/openssl_intermediate.cnf -key ~/src/ca/intermediateCA/private/intermediate.key.pem -new -sha256 -out ~/src/ca/intermediateCA/csr/intermediate.csr.pem -subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/OU=Information Systems/CN=Intermediate CA"
+https://security.stackexchange.com/questions/252622/what-is-the-purpose-of-certificatepolicies-in-a-csr-how-should-an-oid-be-used
+openssl req -passin file:/home/brent/src/ca/mypass.enc \
+-config ~/src/ca/openssl_intermediate.cnf \
+-key ~/src/ca/intermediateCA/private/intermediate.key.pem \
+-new -sha256 -out ~/src/ca/intermediateCA/csr/intermediate2.csr.pem -subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/CN=Intermediate CA"
+# note 
+# ERROR	OrganizationalUnitName is prohibited if...the certificate was issued on or after September 1, 2022
 
 # Sign the intermediate CSR with the root CA key:
 bash
 https://www.openssl.org/docs/man1.1.1/man1/ca.html
-openssl ca -passin file:/home/brent/src/ca/mypass.enc -rand_serial -config ~/src/ca/openssl_root.cnf -extensions v3_intermediate_ca -days 3650 -notext -md sha256 -in ~/src/ca/intermediateCA/csr/intermediate.csr.pem -out ~/src/ca/intermediateCA/certs/intermediate.cert.pem
+openssl ca -passin file:/home/brent/src/ca/mypass.enc \
+-rand_serial -config ~/src/ca/openssl_root.cnf \
+-extensions v3_intermediate_ca \
+-days 3650 -notext -md sha256 \
+-in ~/src/ca/intermediateCA/csr/intermediate2.csr.pem \
+-out ~/src/ca/intermediateCA/certs/intermediate2.cert.pem
 ## note: 
 https://www.openssl.org/docs/man1.1.1/man1/ca.html
 The ca command is a minimal CA application. It can be used to sign certificate requests in a variety of forms and generate CRLs it also maintains a text database of issued certificates and their status.
