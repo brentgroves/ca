@@ -5,6 +5,9 @@ https://security.stackexchange.com/questions/252622/what-is-the-purpose-of-certi
 # cablint	WARNING	Certificate does not include authorityInformationAccess. BRs require OCSP stapling for this certificate.
 authorityInfoAccess = OCSP;URI:http://ocsp.busche-cnc.com/
 authorityInfoAccess = caIssuers;URI:http://my.ca/ca.html
+authorityInfoAccess = OCSP;URI:http://ocsp.example.com/,caIssuers;URI:http://myca.example.com/ca.cer
+
+authorityInfoAccess = OCSP;URI:http://ocsp.example.com/
 cablint	WARNING	Deprecated Netscape extension 2.16.840.1.113730.1.13 treated as opaque extension
 cablint	WARNING	Deprecated Netscape extension 2.16.840.1.113730.1.1 treated as opaque extension
 cablint	INFO	Name has deprecated attribute emailAddress
