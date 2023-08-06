@@ -25,13 +25,15 @@ policy            = policy_loose                         # Certificate policy
 
 [ policy_loose ]                                         # Policy for less strict validation
 countryName             = optional                       # Country is optional
-stateOrProvinceName     = optional                       # State or province is optional
-localityName            = optional                       # Locality is optional
-organizationName        = optional                       # Organization is optional
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, locality name MUST NOT be included in subject
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, organization name MUST NOT be included in subject
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, stateOrProvinceName MUST NOT be included in subject
+# stateOrProvinceName     = optional                       # State or province is optional
+# localityName            = optional                       # Locality is optional
+# organizationName        = optional                       # Organization is optional
 organizationalUnitName  = optional                       # Organizational unit is optional
 # INFO	Subject has a deprecated CommonName
-# dont use this in openssl_intermediate_for_san_certificate.cnf
-commonName              = supplied                       # Must provide a common name
+# commonName              = supplied                       # Must provide a common name
 emailAddress            = optional                       # Email address is optional
 
 [ req ]                                                  # Request settings
@@ -44,20 +46,23 @@ x509_extensions     = v3_intermediate_ca                 # Extensions for interm
 [ req_distinguished_name ]                               # Template for the DN in the CSR
 countryName                     = Country Name (2 letter code)
 countryName_default             = US
-stateOrProvinceName             = State or Province Name
-stateOrProvinceName_default     = Indiana
-localityName                    = Locality Name
-localityName_default            = Albion
-0.organizationName              = Organization Name
-0.organizationName_default      = Mobex Global
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, locality name MUST NOT be included in subject
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, organization name MUST NOT be included in subject
+# zlint	ERROR	If certificate policy 2.23.140.1.2.1 (CA/B BR domain validated) is included, stateOrProvinceName MUST NOT be included in subject
+# stateOrProvinceName             = State or Province Name
+# stateOrProvinceName_default     = Indiana
+# localityName                    = Locality Name
+# localityName_default            = Albion
+# 0.organizationName              = Organization Name
+# 0.organizationName_default      = Mobex Global
 # ERROR	OrganizationalUnitName is prohibited if...the certificate was issued on or after September 1, 2022
 # organizationalUnitName          = Organizational Unit Name (section)
 # x509lint	INFO	Subject has a deprecated CommonName
 # The commonName field needed to be supplied and was missing
 # I think I should keep this field when generating server csr 
 # becauase If I don't openssl ca generates an error
-commonName                      = Common Name
-commonName_default              = www.busche-cnc.com
+# commonName                      = Common Name
+# commonName_default              = www.busche-cnc.com
 # cablint	INFO	Name has deprecated attribute emailAddress
 # emailAddress                    = Email Address
 # emailAddress_default            = bgroves@mobexglobal.com
@@ -73,8 +78,7 @@ basicConstraints = critical, CA:true, pathlen:0             # Basic constraints 
 # https://www.openssl.org/docs/manmaster/man5/x509v3_config.html
 keyUsage = critical, keyCertSign, digitalSignature, cRLSign           # Key usage for a CA
 # For general purpose CAs, you can use a universal Object Identifier with the value 2.5.29.32.0. This identifier means “All Issuance Policies” and is a sort of wildcard policy. Any policy will match this identifier during certificate chain validation.
-# certificatePolicies = 2.5.29.32.0 # any policy
-# certificatePolicies = 2.23.140.1.2.1 # validation policy
+# certificatePolicies = 2.5.29.32.0
 # https://security.stackexchange.com/questions/264110/how-to-determine-validation-process-of-a-certificate-used-by-a-website-using-htt
 certificatePolicies = 2.23.140.1.2.1, 2.5.29.32.0
 # https://security.stackexchange.com/questions/252622/what-is-the-purpose-of-certificatepolicies-in-a-csr-how-should-an-oid-be-used
@@ -104,10 +108,8 @@ authorityInfoAccess = OCSP;URI:http://ocsp.busche-cnc.com/,caIssuers;URI:http://
 # added because: ERROR	No policy extension
 # For general purpose CAs, you can use a universal Object Identifier with the value 2.5.29.32.0. This identifier means “All Issuance Policies” and is a sort of wildcard policy. Any policy will match this identifier during certificate chain validation.
 # certificatePolicies = 2.5.29.32.0
-
-# For general purpose CAs, you can use a universal Object Identifier with the value 2.5.29.32.0. This identifier means “All Issuance Policies” and is a sort of wildcard policy. Any policy will match this identifier during certificate chain validation.
-# certificatePolicies = 2.5.29.32.0
 # https://security.stackexchange.com/questions/264110/how-to-determine-validation-process-of-a-certificate-used-by-a-website-using-htt
-certificatePolicies = 2.23.140.1.2.1, 2.5.29.32.0 
+certificatePolicies = 2.23.140.1.2.1, 2.5.29.32.0
+# certificatePolicies = 1.2.3.4
 [alt_names]
 DNS.1 = moto.busche-cnc.com

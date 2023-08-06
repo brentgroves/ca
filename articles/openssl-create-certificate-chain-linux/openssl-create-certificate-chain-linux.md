@@ -24,7 +24,7 @@ private: This directory contains the private keys for the CA, including the root
 
 The majority of the files that the CA uses are visible to anyone on the system or at least to anyone who makes any use of the certificates issued by our CA. The one notable exception is the CA certificate’s private key. The private key should never be disclosed to anyone not authorized to issue a certificate or CRL from our CA. The private key should be stored in hardware, or at least on a machine that is never put on a network
 
-# don't do this initializing of the serial number
+# don't do this initializing of the serial number because we want openssl to generate a very long serial number
 A serial file is used to keep track of the last serial number that was used to issue a certificate. It’s important that no two certificates ever be issued with the same serial number from the same CA. OpenSSL is somewhat quirky about how it handles this file. It expects the value to be in hex, and it must contain at least two digits. By setting the initial value to 1000, we ensure that the serial numbers start from 1000 and increment for each subsequent certificate issued.
 
 echo 1000 > ~/src/ca/rootCA/serial
@@ -39,7 +39,7 @@ If the -CA option is specified and neither <-CAserial> or <-CAcreateserial> is g
 -CAcreateserial
 With this option and the -CA option the CA serial number file is created if it does not exist. A random number is generated, used for the certificate, and saved into the serial number file determined as described above.
 
-# crlnumber
+# crlnumber (did not do this yet)
 A crlnumber is a configuration directive specifying the file that contains the current CRL number. The CRL number is a unique integer that is incremented each time a new Certificate Revocation List (CRL) is generated. This helps in tracking the latest CRL issued by the CA and ensuring that CRLs are issued in a proper sequence. We have given a random digit in our crlnumber file which will be used to keep track of all certs which are revocated.
 
 bash
@@ -49,8 +49,8 @@ echo 0100 > ~/src/ca/intermediateCA/crlnumber
 # index.txt
 Next we will create index.txt file which is a database of sorts that keeps track of the certificates that have been issued by the CA. Each line in the index.txt file represents a certificate and contains information such as the certificate's status (e.g., valid, revoked), the certificate's expiration date, the certificate's serial number, and the certificate subject's distinguished name (DN).
 
-Since no certificates have been issued at this point and OpenSSL requires that the file exist, we’ll simply create an empty file.
-
+Since no certificates have been issued at this point and OpenSSL 'ca' requires that the file exist, we’ll simply create an empty file.
+openssl x509 does not create this database but creates an srl file with the serial number in it.
 bash
 touch ~/src/ca/rootCA/index.txt
 touch ~/src/ca/intermediateCA/index.txt
@@ -116,12 +116,7 @@ the Subject, which refers to the certificate itself
 The Issuer and Subject are identical as the certificate is self-signed.
 The output also shows the X509v3 extensions. We applied the v3_ca extension, so the options from [ v3_ca ] should be reflected in the output.
 
-# chrome linter
-https://crt.sh/lintcert
-cablint	NOTICE	CA certificates without Digital Signature do not allow direct signing of OCSP responses
-cablint	INFO	CA certificate identified
-x509lint	INFO	Checking as root CA certificate
-zlint	NOTICE	Root and Subordinate CA Certificates that wish to use their private key for signing OCSP responses will not be able to without their digital signature set
+
 
 # Step 4: Generate the intermediate CA key pair and certificate
 Create an RSA key pair for the intermediate CA without a password and secure the file by removing permissions to groups and others:
@@ -141,7 +136,7 @@ https://security.stackexchange.com/questions/252622/what-is-the-purpose-of-certi
 openssl req -passin file:/home/brent/src/ca/mypass.enc \
 -config ~/src/ca/openssl_intermediate.cnf \
 -key ~/src/ca/intermediateCA/private/intermediate.key.pem \
--new -sha256 -out ~/src/ca/intermediateCA/csr/intermediate2.csr.pem -subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/CN=Intermediate CA"
+-new -sha256 -out ~/src/ca/intermediateCA/csr/intermediate.csr.pem -subj "/C=US/ST=Indiana/L=Albion/O=Mobex Global/CN=Intermediate CA"
 # note 
 # ERROR	OrganizationalUnitName is prohibited if...the certificate was issued on or after September 1, 2022
 
@@ -152,8 +147,7 @@ openssl ca -passin file:/home/brent/src/ca/mypass.enc \
 -rand_serial -config ~/src/ca/openssl_root.cnf \
 -extensions v3_intermediate_ca \
 -days 3650 -notext -md sha256 \
--in ~/src/ca/intermediateCA/csr/intermediate2.csr.pem \
--out ~/src/ca/intermediateCA/certs/intermediate2.cert.pem
+-in ~/src/ca/intermediateCA/csr/intermediate.csr.pem -out ~/src/ca/intermediateCA/certs/intermediate.cert.pem 
 ## note: 
 https://www.openssl.org/docs/man1.1.1/man1/ca.html
 The ca command is a minimal CA application. It can be used to sign certificate requests in a variety of forms and generate CRLs it also maintains a text database of issued certificates and their status.
@@ -185,6 +179,7 @@ CN: Intermediate CA
 ## note: 
 our serial number is much longer since we used the -rand_serial parameter
 Here,
+index.txt.attr says subject not unique
 
 # Verify the Intermediate CA Certificate content
 bash
@@ -197,38 +192,59 @@ bash
 openssl verify -CAfile ~/src/ca/rootCA/certs/ca.cert.pem ~/src/ca/intermediateCA/certs/intermediate.cert.pem
 /home/brent/src/ca/intermediateCA/certs/intermediate.cert.pem: OK
 
+# check with linter
+https://crt.sh/lintcert
+
 # Step 5: Generate OpenSSL Create Certificate Chain (Certificate Bundle)
 To openssl create certificate chain (certificate bundle), concatenate the intermediate and root certificates together.
 
 In the below example I have combined my Root and Intermediate CA certificates to openssl create certificate chain in Linux. We will use this file later to verify certificates signed by the intermediate CA.
 
 bash
-cat ~/src/ca/intermediateCA/certs/intermediate.cert.pem ~/src/ca/rootCA/certs/ca.cert.pem > ~/src/ca/intermediateCA/certs/ca-chain.cert.pem
+cat ~/src/ca/intermediateCA/certs/intermediate.cert.pem ~/src/ca/rootCA/certs/ca.cert.pem > ~/src/ca/intermediateCA/certs/ca-chain-bundle.cert.pem
 
 # verify certificate signature
 After openssl create certificate chain, to verify certificate chain use below command:
 
 bash
-openssl verify -CAfile ~/src/ca/intermediateCA/certs/ca-chain.cert.pem ~/src/ca/intermediateCA/certs/intermediate.cert.pem
+openssl verify -CAfile ~/src/ca/intermediateCA/certs/ca-chain-bundle.cert.pem ~/src/ca/intermediateCA/certs/intermediate.cert.pem
 /home/brent/src/ca/intermediateCA/certs/intermediate.cert.pem: OK
 
 # Step 6: Generate and sign server certificate using Intermediate CA
+DONT USE THIS BUT USE SAN CERTIFICATE CREATED IN
+openssl-generate-csr-create-san-certificat.md doc
 Create a private key for the server:
 
 bash
 https://www.openssl.org/docs/manmaster/man1/openssl-genpkey.html
 openssl genpkey -des3 -pass file:/home/brent/src/ca/mypass.enc -algorithm RSA -out ~/src/ca/intermediateCA/private/moto.busche-cnc.com.key.pem
-chmod 400 ~/myCA/intermediateCA/private/moto.busche-cnc.com.key.pem
+chmod 400 ~/src/ca/intermediateCA/private/moto.busche-cnc.com.key.pem
 Create a certificate signing request (CSR) for the server:
+
+# create the csr
 bash
-openssl req -passin file:/home/brent/src/ca/mypass.enc -config ~/src/ca/openssl_intermediate.cnf -key ~/src/ca/intermediateCA/private/moto.busche-cnc.com.key.pem -new -sha256 -out ~/src/ca/intermediateCA/csr/moto.busche-cnc.com.csr.pem
+openssl req -passin file:/home/brent/src/ca/mypass.enc \
+-config ~/src/ca/openssl_intermediate.cnf \
+-key ~/src/ca/intermediateCA/private/moto.busche-cnc.com.key.pem \
+-new -sha256 -out ~/src/ca/intermediateCA/csr/moto.busche-cnc.com.csr.pem
 
 
 # Sign the server CSR with the intermediate CA:
+# I changed the server_cert section from what the author had to match
+# the content of the san tutorials server_cert_ext.cnf file
 bash
 https://www.openssl.org/docs/man1.1.1/man1/ca.html
-openssl ca -passin file:/home/brent/src/ca/mypass.enc -rand_serial -config ~/src/ca/openssl_intermediate.cnf -extensions server_cert -days 375 -notext -md sha256 -in ~/src/ca/intermediateCA/csr/moto.busche-cnc.com.csr.pem -out ~/src/ca/intermediateCA/certs/moto.busche-cnc.com.cert.pem
+openssl ca -passin file:/home/brent/src/ca/mypass.enc \
+-rand_serial -config ~/src/ca/openssl_intermediate.cnf \
+-extensions server_cert -days 375 -notext -md sha256 \
+-in ~/src/ca/intermediateCA/csr/moto.busche-cnc.com.csr.pem \
+-out ~/src/ca/intermediateCA/certs/moto.busche-cnc.com.cert.pem
+
+The commonName field needed to be supplied and was missing
 
 # Verify the server certificate:
 bash
 openssl x509 -noout -text -in ~/src/ca/intermediateCA/certs/moto.busche-cnc.com.cert.pem
+
+# Check with linter
+https://crt.sh/lintcert

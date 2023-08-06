@@ -1,6 +1,7 @@
-cablint	ERROR	BR certificates must include certificatePolicies
-https://www.sysadmins.lv/blog-en/certificate-policies-extension-all-you-should-know-part-1.aspx
-https://security.stackexchange.com/questions/252622/what-is-the-purpose-of-certificatepolicies-in-a-csr-how-should-an-oid-be-used
+https://crt.sh/lintcert
+https://tools.keycdn.com/ssl 
+https://github.com/zmap/zlint
+
 
 # cablint	WARNING	Certificate does not include authorityInformationAccess. BRs require OCSP stapling for this certificate.
 authorityInfoAccess = OCSP;URI:http://ocsp.busche-cnc.com/
@@ -31,15 +32,10 @@ zlint	WARNING	Subscriber certificates authorityInformationAccess extension shoul
 zlint	NOTICE	Check if certificate has enough embedded SCTs to meet Apple CT Policy
 zlint	NOTICE	Subscriber Certificate: commonName is deprecated.
 
-# linter errors left
-START HERE
-cablint	ERROR	BR certificates must include an HTTP URL of the OCSP responder
-cablint	INFO	Name has deprecated attribute emailAddress
+# no linter errors left
 cablint	INFO	TLS Server certificate identified
-x509lint	ERROR	No OCSP over HTTP
 x509lint	INFO	Checking as leaf certificate
 x509lint	INFO	Subject has a deprecated CommonName
 x509lint	INFO	Unknown validation policy
-zlint	ERROR	Subscriber Certificate: authorityInformationAccess MUST contain the HTTP URL of the Issuing CA's OSCP responder.
 zlint	NOTICE	Check if certificate has enough embedded SCTs to meet Apple CT Policy
 zlint	NOTICE	Subscriber Certificate: commonName is deprecated.

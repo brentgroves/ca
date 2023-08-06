@@ -1,3 +1,5 @@
+https://github.com/crtsh
+https://crt.sh/lintcert
 https://github.com/cert-manager/cert-manager/issues/481
 https://www.sectigo.com/
 90-Day SSL Certificates Are Coming

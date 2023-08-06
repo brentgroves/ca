@@ -17,8 +17,6 @@ extendedKeyUsage = serverAuth                               # Extended key usage
 
 
 
-# issues left
-cablint	NOTICE	CA certificates without Digital Signature do not allow direct signing of OCSP responses
+# no issues left 
 cablint	INFO	CA certificate identified
 x509lint	INFO	Checking as intermediate CA certificate
-zlint	NOTICE	Root and Subordinate CA Certificates that wish to use their private key for signing OCSP responses will not be able to without their digital signature set
