@@ -35,7 +35,4 @@ zlint	NOTICE	Subscriber Certificate: commonName is deprecated.
 # no linter errors left
 cablint	INFO	TLS Server certificate identified
 x509lint	INFO	Checking as leaf certificate
-x509lint	INFO	Subject has a deprecated CommonName
-x509lint	INFO	Unknown validation policy
 zlint	NOTICE	Check if certificate has enough embedded SCTs to meet Apple CT Policy
-zlint	NOTICE	Subscriber Certificate: commonName is deprecated.

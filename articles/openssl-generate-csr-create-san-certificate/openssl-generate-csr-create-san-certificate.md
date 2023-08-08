@@ -82,6 +82,7 @@ No chain issues detected.
 2. Subject CN: Intermediate CA > Issuer CN: Root CA
 3. Subject CN: Root CA > Issuer CN: Root CA
 
+https://crt.sh/lintcert
 
 # install in trust store
 https://support.securly.com/hc/en-us/articles/360036106474-How-to-install-Securly-SSL-certificate-via-Group-Policy-
